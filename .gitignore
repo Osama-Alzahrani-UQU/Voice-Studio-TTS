@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# PyInstaller build artifacts
+build/
+dist/
+
+# Local AI model caches & runtime temporary audio
+tts_models/
+hf_models/
+torch_cache/
+temp_audio/
+exports/
+
+# IDE & OS files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

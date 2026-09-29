@@ -48,6 +48,10 @@ class UnifiedTTSManager:
     def get_active_engine_name(self) -> str:
         return self.active_engine_name
 
+    def get_available_engines(self) -> List[str]:
+        """Returns list of configured engine identifiers."""
+        return list(self.ENGINES.keys())
+
     def get_active_engine(self):
         if self.active_engine_name == "omnivoice":
             return self.omnivoice_engine

@@ -11,6 +11,7 @@ env/
 # PyInstaller build artifacts
 build/
 dist/
+*.zip
 
 # Local AI model caches & runtime temporary audio
 tts_models/

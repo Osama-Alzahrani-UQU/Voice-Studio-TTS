@@ -112,6 +112,10 @@ def build():
         "--hidden-import=webdataset",
         "--collect-all=tensorboardX",
         "--hidden-import=tensorboardX",
+        "--hidden-import=audio_dsp",
+        "--hidden-import=ssml_lite",
+        "--hidden-import=mcp_server",
+        "--hidden-import=cli_synthesizer",
         main_script,
     ]
 

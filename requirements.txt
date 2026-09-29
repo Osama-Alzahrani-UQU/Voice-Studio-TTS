@@ -40,3 +40,4 @@ webdataset>=0.2.86
 tensorboardX>=2.6.2
 pyarabic>=0.6.15
 tashaphyne>=0.3.6
+mcp>=1.0.0

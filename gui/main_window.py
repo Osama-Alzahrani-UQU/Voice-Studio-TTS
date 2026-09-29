@@ -18,6 +18,7 @@ from omnivoice_engine import OmniVoiceEngineManager
 from unified_tts_manager import UnifiedTTSManager
 from audio_player import AudioPlayerController
 from gui.chat_bubble import UserChatBubble, AIChatBubble, LoadingChatBubble
+from audio_dsp import EFFECT_PRESETS
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
@@ -62,6 +63,14 @@ class XTTSArabicEnglishChatApp(ctk.CTk):
             "select_ref_audio_dlg": "Select Reference Audio File (3-10s)",
             "cloned_saved_title": "Voice Profile Saved",
             "cloned_saved_msg": "Cloned voice prompt saved successfully to:\n",
+            "dsp_label": "Mastering:",
+            "dsp_presets": {
+                "broadcast": "📻 Broadcast",
+                "podcast": "🎙️ Podcast",
+                "warm": "☕ Warm",
+                "bright": "✨ Bright",
+                "raw": "🔇 Raw",
+            },
         },
         "ar": {
             "window_title": "Voice Studio — استوديو الصوت والذكاء الاصطناعي",
@@ -95,6 +104,14 @@ class XTTSArabicEnglishChatApp(ctk.CTk):
             "select_ref_audio_dlg": "اختر مقطعاً صوتياً مرجعياً (3-10 ثوانٍ)",
             "cloned_saved_title": "تم حفظ البصمة الصوتية",
             "cloned_saved_msg": "تم حفظ موجه الصوت المستنسخ بنجاح في:\n",
+            "dsp_label": "المعالجة:",
+            "dsp_presets": {
+                "broadcast": "📻 إذاعي",
+                "podcast": "🎙️ بودكاست",
+                "warm": "☕ دافئ",
+                "bright": "✨ مشرق",
+                "raw": "🔇 خام",
+            },
         },
     }
 
@@ -154,6 +171,12 @@ class XTTSArabicEnglishChatApp(ctk.CTk):
         self.selected_omni_accent = ctk.StringVar(value="Auto / Standard")
         self.ref_audio_status_text = ctk.StringVar(
             value=self.TRANSLATIONS["en"]["no_ref_audio"]
+        )
+
+        # Broadcast Audio DSP Mastering (debpalash/VoiceStudio)
+        self.current_dsp_preset = "broadcast"
+        self.selected_dsp_preset = ctk.StringVar(
+            value=self.TRANSLATIONS["en"]["dsp_presets"]["broadcast"]
         )
 
         self.is_processing = False
@@ -540,6 +563,9 @@ class XTTSArabicEnglishChatApp(ctk.CTk):
         chips = [
             ("😂 [laughter]", "[laughter] "),
             ("🤫 [whisper]", "[whisper] "),
+            ("🐢 [slow]", "[slow]"),
+            ("⚡ [fast]", "[fast]"),
+            ("✨ [emphasis]", "[emphasis]"),
             ("⏸️ [pause]", " ... "),
             ("💨 [sigh]", "[sigh] "),
         ]
@@ -548,16 +574,41 @@ class XTTSArabicEnglishChatApp(ctk.CTk):
             btn = ctk.CTkButton(
                 chips_frame,
                 text=label,
-                width=88,
+                width=76,
                 height=26,
                 corner_radius=12,
                 fg_color="#313244",
                 text_color="#cdd6f4",
                 hover_color="#45475a",
-                font=ctk.CTkFont(size=11),
+                font=ctk.CTkFont(size=10),
                 command=lambda t=token: self._insert_chip_token(t),
             )
-            btn.pack(side="left", padx=(0, 6))
+            btn.pack(side="left", padx=(0, 4))
+
+        # DSP Mastering Preset Selector (debpalash/VoiceStudio DSP pipeline)
+        self.dsp_dropdown = ctk.CTkOptionMenu(
+            chips_frame,
+            values=list(self.TRANSLATIONS["en"]["dsp_presets"].values()),
+            variable=self.selected_dsp_preset,
+            width=135,
+            height=26,
+            fg_color="#313244",
+            button_color="#45475a",
+            button_hover_color="#585b70",
+            dropdown_fg_color="#1e1e2e",
+            text_color="#a6e3a1",
+            font=ctk.CTkFont(size=10, weight="bold"),
+            command=self._on_dsp_change,
+        )
+        self.dsp_dropdown.pack(side="right", padx=(4, 0))
+
+        self.dsp_label = ctk.CTkLabel(
+            chips_frame,
+            text=self.TRANSLATIONS["en"]["dsp_label"],
+            font=ctk.CTkFont(size=11, weight="bold"),
+            text_color="#cdd6f4",
+        )
+        self.dsp_label.pack(side="right", padx=(0, 4))
 
         # Bottom Input Row
         self.text_entry = ctk.CTkEntry(
@@ -627,6 +678,20 @@ class XTTSArabicEnglishChatApp(ctk.CTk):
 
         self._refresh_hardware_badge()
         self._initialize_active_engine_async()
+
+    def _on_dsp_change(self, choice: str):
+        """Updates active DSP mastering preset (debpalash/VoiceStudio)."""
+        val = choice.lower()
+        if "podcast" in val or "بودكاست" in val:
+            self.current_dsp_preset = "podcast"
+        elif "warm" in val or "دافئ" in val:
+            self.current_dsp_preset = "warm"
+        elif "bright" in val or "مشرق" in val:
+            self.current_dsp_preset = "bright"
+        elif "raw" in val or "خام" in val:
+            self.current_dsp_preset = "raw"
+        else:
+            self.current_dsp_preset = "broadcast"
 
     def _on_omni_mode_change(self, choice: str):
         """Switches OmniVoice mode between Voice Design, Voice Cloning, and Auto."""
@@ -762,7 +827,16 @@ class XTTSArabicEnglishChatApp(ctk.CTk):
         )
         self.send_button.configure(text=tr["send_btn"])
 
-        # 8. Update all existing cards & audio widgets
+        # 8. Update DSP mastering dropdown and label
+        if hasattr(self, "dsp_label"):
+            self.dsp_label.configure(text=tr["dsp_label"])
+        if hasattr(self, "dsp_dropdown"):
+            dsp_vals = list(tr["dsp_presets"].values())
+            self.dsp_dropdown.configure(values=dsp_vals)
+            current_dsp_val = tr["dsp_presets"].get(self.current_dsp_preset, dsp_vals[0])
+            self.selected_dsp_preset.set(current_dsp_val)
+
+        # 9. Update all existing cards & audio widgets
         for bubble in list(self.chat_bubbles):
             if bubble and bubble.winfo_exists() and hasattr(bubble, "update_ui_language"):
                 bubble.update_ui_language(lang)
@@ -903,6 +977,7 @@ class XTTSArabicEnglishChatApp(ctk.CTk):
                 speed=1.0,
                 omnivoice_mode=self.current_omni_mode,
                 omnivoice_ref_audio=self.selected_ref_audio_path,
+                dsp_preset=self.current_dsp_preset,
                 progress_callback=progress_callback,
             )
             self.after(0, lambda: self._on_generation_success(result))

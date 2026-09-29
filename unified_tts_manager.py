@@ -90,13 +90,14 @@ class UnifiedTTSManager:
         omnivoice_ref_text: Optional[str] = None,
         omnivoice_prompt_path: Optional[str] = None,
         omnivoice_num_step: int = 32,
+        dsp_preset: str = "broadcast",
         progress_callback: Optional[Callable[[int, int, str], None]] = None,
     ) -> Dict[str, Any]:
         """
-        Unified dispatch: routes speech synthesis to the currently active engine.
+        Unified dispatch: routes speech synthesis to active engine with broadcast DSP mastering.
         """
         if self.active_engine_name == "omnivoice":
-            return self.omnivoice_engine.generate_speech(
+            result = self.omnivoice_engine.generate_speech(
                 text=text,
                 language=language,
                 mode=omnivoice_mode,
@@ -109,10 +110,28 @@ class UnifiedTTSManager:
                 progress_callback=progress_callback,
             )
         else:
-            return self.xtts_engine.generate_long_speech(
+            result = self.xtts_engine.generate_long_speech(
                 text=text,
                 language=language,
                 speaker=speaker_or_instruct,
                 speed=speed,
                 progress_callback=progress_callback,
             )
+
+        # Apply Broadcast Audio DSP Mastering (debpalash/VoiceStudio pipeline)
+        if dsp_preset and dsp_preset.lower() != "raw":
+            wav_path = result.get("output_path")
+            if wav_path and os.path.exists(wav_path):
+                try:
+                    import soundfile as sf
+                    import torch
+                    from audio_dsp import apply_effects_preset
+                    data, sr = sf.read(wav_path, dtype="float32")
+                    tensor = torch.from_numpy(data)
+                    mastered = apply_effects_preset(tensor, sample_rate=sr, preset_name=dsp_preset)
+                    sf.write(wav_path, mastered.cpu().numpy(), sr)
+                    result["dsp_preset"] = dsp_preset
+                except Exception as dsp_err:
+                    print(f"[Unified TTS] DSP Mastering warning: {dsp_err}")
+
+        return result

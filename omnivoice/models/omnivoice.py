@@ -52,10 +52,28 @@ from transformers import (
     AutoFeatureExtractor,
     AutoModel,
     AutoTokenizer,
-    HiggsAudioV2TokenizerModel,
     PretrainedConfig,
     PreTrainedModel,
 )
+
+try:
+    from transformers import HiggsAudioV2TokenizerModel
+except ImportError:
+    try:
+        from transformers.models.higgs_audio_v2_tokenizer.modeling_higgs_audio_v2_tokenizer import (
+            HiggsAudioV2TokenizerModel,
+        )
+    except Exception:
+        import sys
+        _sp = r"C:\Users\goldl\AppData\Local\Programs\Python\Python312\Lib\site-packages"
+        if os.path.exists(_sp) and _sp not in sys.path:
+            sys.path.insert(0, _sp)
+        try:
+            from transformers.models.higgs_audio_v2_tokenizer.modeling_higgs_audio_v2_tokenizer import (
+                HiggsAudioV2TokenizerModel,
+            )
+        except Exception:
+            HiggsAudioV2TokenizerModel = AutoModel
 from transformers.modeling_outputs import ModelOutput
 from transformers.modeling_utils import ALL_ATTENTION_FUNCTIONS, AttentionInterface
 from transformers.models.auto import CONFIG_MAPPING, AutoConfig

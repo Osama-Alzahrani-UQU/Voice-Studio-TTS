@@ -130,6 +130,33 @@ try:
 except Exception:
     pass
 
+# Transformers 5.x backward-compatibility shim for Coqui XTTS streaming generator
+try:
+    import transformers
+    import transformers.generation.utils as _gu
+
+    class _DummyScorer:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    for _cls_name in (
+        "BeamSearchScorer",
+        "ConstrainedBeamSearchScorer",
+        "DisjunctiveConstraint",
+        "PhrasalConstraint",
+    ):
+        if not hasattr(transformers, _cls_name):
+            if hasattr(transformers, "_objects") and isinstance(transformers._objects, dict):
+                transformers._objects[_cls_name] = _DummyScorer
+            setattr(transformers, _cls_name, _DummyScorer)
+            if "transformers" in sys.modules:
+                setattr(sys.modules["transformers"], _cls_name, _DummyScorer)
+
+    if not hasattr(_gu, "SampleOutput"):
+        setattr(_gu, "SampleOutput", getattr(_gu, "GenerateDecoderOnlyOutput", _DummyScorer))
+except Exception:
+    pass
+
 
 def _get_coqui_tts_class():
     """Safely resolves the Coqui TTS API class."""

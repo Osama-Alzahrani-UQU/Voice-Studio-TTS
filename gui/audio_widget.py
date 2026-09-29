@@ -26,6 +26,7 @@ class EmbeddedAudioWidget(ctk.CTkFrame):
         speaker: str = "",
         language: str = "ar",
         ui_lang: str = None,
+        engine: str = "xtts",
         **kwargs,
     ):
         super().__init__(
@@ -40,7 +41,8 @@ class EmbeddedAudioWidget(ctk.CTkFrame):
         self.filepath = filepath
         self.duration = duration
         self.speaker = speaker
-        self.speaker_id = XTTSEngineManager.resolve_speaker_id(speaker) if speaker else ""
+        self.engine = engine or "xtts"
+        self.speaker_id = XTTSEngineManager.resolve_speaker_id(speaker) if speaker and self.engine != "omnivoice" else ""
         self.language = language
         self.ui_lang = ui_lang or language
         self.is_playing = False
@@ -92,12 +94,16 @@ class EmbeddedAudioWidget(ctk.CTkFrame):
 
     def _get_info_text(self) -> str:
         unit = "s" if self.ui_lang == "en" else " ث"
-        info_text = f"{self.duration:.1f}{unit}"
+        engine_badge = "[OmniVoice]" if self.engine == "omnivoice" else "[XTTS v2]"
+        info_text = f"{engine_badge}  {self.duration:.1f}{unit}"
         if self.speaker:
-            localized_speaker = XTTSEngineManager.get_speaker_display_name(
-                self.speaker_id or self.speaker, self.ui_lang
-            )
-            info_text += f"  •  {localized_speaker}"
+            if self.engine == "omnivoice" or "," in self.speaker:
+                info_text += f"  •  {self.speaker}"
+            else:
+                localized_speaker = XTTSEngineManager.get_speaker_display_name(
+                    self.speaker_id or self.speaker, self.ui_lang
+                )
+                info_text += f"  •  {localized_speaker}"
         return info_text
 
     def update_ui_language(self, ui_lang: str):

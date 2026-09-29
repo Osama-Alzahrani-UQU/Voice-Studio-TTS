@@ -84,6 +84,7 @@ class AIChatBubble(ctk.CTkFrame):
         language: str = "ar",
         timestamp: str = None,
         ui_lang: str = None,
+        engine: str = "xtts",
         **kwargs,
     ):
         super().__init__(
@@ -98,7 +99,8 @@ class AIChatBubble(ctk.CTkFrame):
         self.timestamp = timestamp or time.strftime("%H:%M")
         self.language = language
         self.speaker = speaker
-        self.speaker_id = XTTSEngineManager.resolve_speaker_id(speaker) if speaker else ""
+        self.engine = engine or "xtts"
+        self.speaker_id = XTTSEngineManager.resolve_speaker_id(speaker) if speaker and self.engine != "omnivoice" else ""
         self.ui_lang = ui_lang or language
         self.is_rtl = language == "ar"
         anchor_pos = "e" if self.is_rtl else "w"
@@ -133,20 +135,25 @@ class AIChatBubble(ctk.CTkFrame):
             speaker=speaker,
             language=language,
             ui_lang=self.ui_lang,
+            engine=self.engine,
         )
         self.audio_widget.grid(row=2, column=0, padx=10, pady=(0, 10), sticky="ew")
 
     def _get_header_text(self) -> str:
-        localized_speaker = (
-            XTTSEngineManager.get_speaker_display_name(
-                self.speaker_id or self.speaker, self.ui_lang
+        if self.engine == "omnivoice" or "," in self.speaker:
+            display_speaker = self.speaker
+        else:
+            display_speaker = (
+                XTTSEngineManager.get_speaker_display_name(
+                    self.speaker_id or self.speaker, self.ui_lang
+                )
+                if self.speaker
+                else ""
             )
-            if self.speaker
-            else ""
-        )
+        prefix = "OmniVoice" if self.engine == "omnivoice" else "XTTS"
         if self.ui_lang == "ar":
-            return f"المقطع الصوتي ({localized_speaker}) • {self.timestamp}"
-        return f"Audio Output ({localized_speaker}) • {self.timestamp}"
+            return f"المقطع الصوتي ({prefix} • {display_speaker}) • {self.timestamp}"
+        return f"Audio Output ({prefix} • {display_speaker}) • {self.timestamp}"
 
     def update_ui_language(self, ui_lang: str):
         """Updates card header and embedded audio widget when UI language switches."""

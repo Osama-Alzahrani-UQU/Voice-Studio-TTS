@@ -104,6 +104,14 @@ def build():
         "--hidden-import=pyarabic",
         "--collect-all=tashaphyne",
         "--hidden-import=tashaphyne",
+        "--collect-all=omnivoice",
+        "--hidden-import=omnivoice",
+        "--collect-all=accelerate",
+        "--hidden-import=accelerate",
+        "--collect-all=webdataset",
+        "--hidden-import=webdataset",
+        "--collect-all=tensorboardX",
+        "--hidden-import=tensorboardX",
         main_script,
     ]
 

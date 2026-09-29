@@ -5,6 +5,8 @@ Provides a clean, unified facade managing both Coqui XTTS v2 and k2-fsa OmniVoic
 engines with seamless switching, unified playback handling, and cross-engine status.
 """
 
+import os
+import sys
 import threading
 from typing import Dict, List, Optional, Callable, Any
 
@@ -120,7 +122,7 @@ class UnifiedTTSManager:
 
         # Apply Broadcast Audio DSP Mastering (debpalash/VoiceStudio pipeline)
         if dsp_preset and dsp_preset.lower() != "raw":
-            wav_path = result.get("output_path")
+            wav_path = result.get("output_path") or result.get("filepath")
             if wav_path and os.path.exists(wav_path):
                 try:
                     import soundfile as sf

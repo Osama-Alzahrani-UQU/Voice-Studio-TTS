@@ -53,18 +53,22 @@ def main():
     mgr.set_engine(args.engine)
     mgr.get_active_engine().initialize()
 
+    speaker_param = args.speaker
+    if args.engine == "omnivoice" and speaker_param == "Damien_Black":
+        speaker_param = "female, young adult, british accent"
+
     print(f"[Voice Studio CLI] Synthesizing ({len(content)} characters, lang: {args.lang}, dsp: {args.dsp})...")
     res = mgr.generate_speech(
         text=content,
         language=args.lang,
-        speaker_or_instruct=args.speaker,
+        speaker_or_instruct=speaker_param,
         speed=args.speed,
         omnivoice_mode="clone" if args.ref_audio else "design",
         omnivoice_ref_audio=args.ref_audio,
         dsp_preset=args.dsp,
     )
 
-    out_file = res.get("output_path")
+    out_file = res.get("output_path") or res.get("filepath")
     if args.output and out_file and os.path.exists(out_file):
         import shutil
         shutil.copy2(out_file, args.output)

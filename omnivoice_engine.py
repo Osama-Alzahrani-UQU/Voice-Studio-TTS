@@ -270,8 +270,8 @@ class OmniVoiceEngineManager:
         if not lang_input:
             return "en"
         val = lang_input.strip().lower()
-        if "arab" in val or "عرب" in val or val == "ar":
-            return "ar"
+        if "arab" in val or "عرب" in val or val in ("ar", "arb"):
+            return "arb"
         if "eng" in val or val == "en":
             return "en"
 
@@ -363,8 +363,20 @@ class OmniVoiceEngineManager:
 
             if mode == "clone" and voice_clone_prompt is not None:
                 kw["voice_clone_prompt"] = voice_clone_prompt
-            elif mode == "design" and instruct:
-                kw["instruct"] = instruct
+            elif mode == "design":
+                if instruct:
+                    valid_tokens = {
+                        "female", "male", "young adult", "child", "teenager", "middle-aged", "elderly",
+                        "moderate pitch", "low pitch", "very low pitch", "high pitch", "very high pitch",
+                        "whisper", "american accent", "british accent", "australian accent", "canadian accent",
+                        "indian accent", "korean accent", "russian accent", "japanese accent", "chinese accent",
+                        "portuguese accent",
+                    }
+                    given_tokens = [tok.strip().lower() for tok in str(instruct).split(",") if tok.strip()]
+                    cleaned_tokens = [tok for tok in given_tokens if tok in valid_tokens]
+                    kw["instruct"] = ", ".join(cleaned_tokens) if cleaned_tokens else self.DEFAULT_INSTRUCT
+                else:
+                    kw["instruct"] = self.DEFAULT_INSTRUCT
 
             audio_result = self.model.generate(**kw)
             chunk_waveform = audio_result[0]
@@ -390,6 +402,7 @@ class OmniVoiceEngineManager:
         speaker_label = instruct if mode == "design" else ("Cloned Voice" if mode == "clone" else "Auto Voice")
 
         return {
+            "output_path": output_path,
             "filepath": output_path,
             "duration": duration,
             "text": text_clean,

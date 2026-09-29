@@ -27,6 +27,9 @@ from xtts_engine import (
 
 try:
     import transformers
+    import transformers.utils
+    if not hasattr(transformers.utils, "is_numba_available"):
+        transformers.utils.is_numba_available = lambda: False
     import transformers.utils.versions as _tuv
     _tuv.require_version = lambda *args, **kwargs: None
     _tuv.require_version_core = lambda *args, **kwargs: None

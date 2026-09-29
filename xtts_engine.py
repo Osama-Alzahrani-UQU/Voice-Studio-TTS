@@ -133,6 +133,9 @@ except Exception:
 # Transformers 5.x backward-compatibility shim for Coqui XTTS streaming generator
 try:
     import transformers
+    import transformers.utils
+    if not hasattr(transformers.utils, "is_numba_available"):
+        transformers.utils.is_numba_available = lambda: False
     import transformers.generation.utils as _gu
     import transformers.utils.versions as _tuv
     _tuv.require_version = lambda *args, **kwargs: None
@@ -148,23 +151,31 @@ try:
         "DisjunctiveConstraint",
         "PhrasalConstraint",
     ):
-        if not hasattr(transformers, _cls_name):
-            if hasattr(transformers, "_objects") and isinstance(transformers._objects, dict):
-                transformers._objects[_cls_name] = _DummyScorer
+        for _dict_attr in ("_objects", "_extra_objects"):
+            if hasattr(transformers, _dict_attr) and isinstance(getattr(transformers, _dict_attr), dict):
+                getattr(transformers, _dict_attr)[_cls_name] = _DummyScorer
+        try:
             setattr(transformers, _cls_name, _DummyScorer)
-            if "transformers" in sys.modules:
-                setattr(sys.modules["transformers"], _cls_name, _DummyScorer)
+        except Exception:
+            pass
 
     if not hasattr(_gu, "SampleOutput"):
-        setattr(_gu, "SampleOutput", getattr(_gu, "GenerateDecoderOnlyOutput", _DummyScorer))
+        setattr(_gu, "SampleOutput", getattr(_gu, "GenerateOutput", _DummyScorer))
 except Exception:
     pass
 
 
 def _get_coqui_tts_class():
-    """Safely resolves the Coqui TTS API class."""
+    """Safely resolves the Coqui TTS API class and ensures GenerationMixin inheritance on Transformers 5.x."""
     try:
         import TTS.api
+        try:
+            from transformers import GenerationMixin
+            from TTS.tts.layers.xtts.gpt_inference import GPT2InferenceModel
+            if GenerationMixin not in GPT2InferenceModel.__mro__:
+                GPT2InferenceModel.__bases__ = GPT2InferenceModel.__bases__ + (GenerationMixin,)
+        except Exception:
+            pass
         if hasattr(TTS.api, "TTS"):
             return TTS.api.TTS
     except Exception as err:

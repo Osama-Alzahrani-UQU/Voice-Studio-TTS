@@ -70,6 +70,17 @@ try:
     if BASE_APP_DIR not in sys.path:
         sys.path.insert(0, BASE_APP_DIR)
 
+    try:
+        import transformers
+        import transformers.utils
+        if not hasattr(transformers.utils, "is_numba_available"):
+            transformers.utils.is_numba_available = lambda: False
+        import transformers.utils.versions as _tuv
+        _tuv.require_version = lambda *args, **kwargs: None
+        _tuv.require_version_core = lambda *args, **kwargs: None
+    except Exception:
+        pass
+
     from create_assets import generate_app_assets
     try:
         if not os.path.exists(os.path.join(ASSETS_DIR, "app_icon.ico")) or not os.path.exists(os.path.join(ASSETS_DIR, "header_banner.png")):

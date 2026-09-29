@@ -25,6 +25,14 @@ from xtts_engine import (
     TORCH_CACHE_DIR,
 )
 
+try:
+    import transformers
+    import transformers.utils.versions as _tuv
+    _tuv.require_version = lambda *args, **kwargs: None
+    _tuv.require_version_core = lambda *args, **kwargs: None
+except Exception:
+    pass
+
 SAVED_PROMPTS_DIR = os.path.join(BASE_APP_DIR, "saved_prompts")
 os.makedirs(SAVED_PROMPTS_DIR, exist_ok=True)
 

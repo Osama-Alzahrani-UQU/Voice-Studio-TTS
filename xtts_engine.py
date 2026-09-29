@@ -134,6 +134,9 @@ except Exception:
 try:
     import transformers
     import transformers.generation.utils as _gu
+    import transformers.utils.versions as _tuv
+    _tuv.require_version = lambda *args, **kwargs: None
+    _tuv.require_version_core = lambda *args, **kwargs: None
 
     class _DummyScorer:
         def __init__(self, *args, **kwargs):

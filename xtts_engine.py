@@ -88,8 +88,9 @@ else:
 
 MALE_DIR = os.path.join(SPEAKERS_DIR, "male")
 FEMALE_DIR = os.path.join(SPEAKERS_DIR, "female")
+CUSTOM_DIR = os.path.join(SPEAKERS_DIR, "custom")
 
-for _folder in (TTS_MODELS_DIR, HF_MODELS_DIR, TORCH_CACHE_DIR, TEMP_AUDIO_DIR, EXPORTS_DIR, SPEAKERS_DIR, MALE_DIR, FEMALE_DIR):
+for _folder in (TTS_MODELS_DIR, HF_MODELS_DIR, TORCH_CACHE_DIR, TEMP_AUDIO_DIR, EXPORTS_DIR, SPEAKERS_DIR, MALE_DIR, FEMALE_DIR, CUSTOM_DIR):
     os.makedirs(_folder, exist_ok=True)
 
 os.environ["TTS_HOME"] = TTS_MODELS_DIR
@@ -217,14 +218,33 @@ class XTTSEngineManager:
         "👩 Female Voices": "female",
     }
 
+    CATEGORY_LABELS_BY_LANG = {
+        "ar": {
+            "all": "🌐 كافة الأصوات",
+            "custom": "⭐ أصوات مخصصة",
+            "male": "👨 أصوات رجالية",
+            "female": "👩 أصوات نسائية",
+        },
+        "en": {
+            "all": "🌐 All Voices",
+            "custom": "⭐ Custom Voices",
+            "male": "👨 Male Voices",
+            "female": "👩 Female Voices",
+        },
+    }
+
     GENDER_LABELS_BY_LANG = {
         "ar": {
             "male": "أصوات رجالية",
             "female": "أصوات نسائية",
+            "custom": "أصوات مخصصة",
+            "all": "كافة الأصوات",
         },
         "en": {
             "male": "Male Voices",
             "female": "Female Voices",
+            "custom": "Custom Voices",
+            "all": "All Voices",
         },
     }
 
@@ -236,6 +256,7 @@ class XTTSEngineManager:
                 "ar": "Damien Black — رخيم",
                 "en": "Damien Black — Deep",
                 "bilingual": "Damien Black — Deep",
+                "gender": "male",
             },
             {
                 "id": "Abrahan_Mack",
@@ -243,6 +264,7 @@ class XTTSEngineManager:
                 "ar": "Abrahan Mack — حيوي",
                 "en": "Abrahan Mack — Energetic",
                 "bilingual": "Abrahan Mack — Energetic",
+                "gender": "male",
             },
             {
                 "id": "Andrew_Kasch",
@@ -250,6 +272,7 @@ class XTTSEngineManager:
                 "ar": "Andrew Kasch — راوي",
                 "en": "Andrew Kasch — Narrator",
                 "bilingual": "Andrew Kasch — Narrator",
+                "gender": "male",
             },
             {
                 "id": "Baldur_Otto",
@@ -257,6 +280,7 @@ class XTTSEngineManager:
                 "ar": "Baldur Otto — جهوري",
                 "en": "Baldur Otto — Resonant",
                 "bilingual": "Baldur Otto — Resonant",
+                "gender": "male",
             },
             {
                 "id": "Adalberto_Santos",
@@ -264,6 +288,7 @@ class XTTSEngineManager:
                 "ar": "Adalberto Santos — واضح",
                 "en": "Adalberto Santos — Clear",
                 "bilingual": "Adalberto Santos — Clear",
+                "gender": "male",
             },
             {
                 "id": "Gideon_Keel",
@@ -271,6 +296,7 @@ class XTTSEngineManager:
                 "ar": "Gideon Keel — دافئ",
                 "en": "Gideon Keel — Warm",
                 "bilingual": "Gideon Keel — Warm",
+                "gender": "male",
             },
         ],
         "female": [
@@ -280,6 +306,7 @@ class XTTSEngineManager:
                 "ar": "Ana Florence — احترافي",
                 "en": "Ana Florence — Professional",
                 "bilingual": "Ana Florence — Professional",
+                "gender": "female",
             },
             {
                 "id": "Claribel_Dervux",
@@ -287,6 +314,7 @@ class XTTSEngineManager:
                 "ar": "Claribel Dervux — دافئ",
                 "en": "Claribel Dervux — Warm",
                 "bilingual": "Claribel Dervux — Warm",
+                "gender": "female",
             },
             {
                 "id": "Daisy_Soft",
@@ -294,6 +322,7 @@ class XTTSEngineManager:
                 "ar": "Daisy Soft — هادئ",
                 "en": "Daisy Soft — Soft",
                 "bilingual": "Daisy Soft — Soft",
+                "gender": "female",
             },
             {
                 "id": "Gracie_MacArthur",
@@ -301,6 +330,7 @@ class XTTSEngineManager:
                 "ar": "Gracie MacArthur — معبر",
                 "en": "Gracie MacArthur — Expressive",
                 "bilingual": "Gracie MacArthur — Expressive",
+                "gender": "female",
             },
             {
                 "id": "Sofia_Medina",
@@ -308,6 +338,7 @@ class XTTSEngineManager:
                 "ar": "Sofia Medina — مشرق",
                 "en": "Sofia Medina — Bright",
                 "bilingual": "Sofia Medina — Bright",
+                "gender": "female",
             },
             {
                 "id": "Tammie_Smith",
@@ -315,6 +346,7 @@ class XTTSEngineManager:
                 "ar": "Tammie Smith — طبيعي",
                 "en": "Tammie Smith — Natural",
                 "bilingual": "Tammie Smith — Natural",
+                "gender": "female",
             },
             {
                 "id": "Alison_Vervaecke",
@@ -322,6 +354,7 @@ class XTTSEngineManager:
                 "ar": "Alison Vervaecke — راوية",
                 "en": "Alison Vervaecke — Narrator",
                 "bilingual": "Alison Vervaecke — Narrator",
+                "gender": "female",
             },
             {
                 "id": "Brenda_Stenaker",
@@ -329,13 +362,11 @@ class XTTSEngineManager:
                 "ar": "Brenda Stenaker — سلس",
                 "en": "Brenda Stenaker — Smooth",
                 "bilingual": "Brenda Stenaker — Smooth",
+                "gender": "female",
             },
         ],
+        "custom": [],
     }
-
-    MALE_SPEAKERS = {item["bilingual"]: item["id"] for item in SPEAKER_CATALOG["male"]}
-    FEMALE_SPEAKERS = {item["bilingual"]: item["id"] for item in SPEAKER_CATALOG["female"]}
-    BUILTIN_SPEAKERS = list(MALE_SPEAKERS.keys()) + list(FEMALE_SPEAKERS.keys())
 
     MODEL_NAME = "tts_models/multilingual/multi-dataset/xtts_v2"
 
@@ -348,41 +379,149 @@ class XTTSEngineManager:
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.device_label = "GPU" if self.device == "cuda" else "CPU"
         self._init_lock = threading.Lock()
+        self.refresh_custom_speakers()
+
+    @classmethod
+    def refresh_custom_speakers(cls) -> List[Dict[str, Any]]:
+        """Scans custom directory and metadata to dynamically register user-recorded voices."""
+        import json
+        custom_items = []
+        meta_file = os.path.join(SPEAKERS_DIR, "voices_metadata.json")
+        meta = {}
+        if os.path.exists(meta_file):
+            try:
+                with open(meta_file, "r", encoding="utf-8") as f:
+                    meta = json.load(f)
+            except Exception:
+                meta = {}
+
+        if os.path.exists(CUSTOM_DIR):
+            for fname in os.listdir(CUSTOM_DIR):
+                if fname.lower().endswith(".wav"):
+                    cid = os.path.splitext(fname)[0]
+                    vmeta = meta.get(cid, {})
+                    display_name = vmeta.get("name", cid.replace("_", " "))
+                    gender = vmeta.get("gender", "male")
+                    item = {
+                        "id": cid,
+                        "raw": display_name,
+                        "ar": f"⭐ {display_name} — صوت مخصص",
+                        "en": f"⭐ {display_name} — Custom Voice",
+                        "bilingual": f"⭐ {display_name} — Custom Voice",
+                        "gender": gender,
+                        "is_custom": True,
+                        "wav_path": os.path.join(CUSTOM_DIR, fname),
+                    }
+                    custom_items.append(item)
+
+        cls.SPEAKER_CATALOG["custom"] = custom_items
+        return custom_items
+
+    @classmethod
+    def get_category_options(cls, lang_code: str = "ar") -> List[str]:
+        lang = "en" if lang_code == "en" else "ar"
+        mapping = cls.CATEGORY_LABELS_BY_LANG[lang]
+        return [mapping["all"], mapping["custom"], mapping["male"], mapping["female"]]
+
+    @classmethod
+    def resolve_category_key(cls, category_label: str) -> str:
+        if not category_label:
+            return "all"
+        l = category_label.lower()
+        if "custom" in l or "مخصص" in l:
+            return "custom"
+        if "female" in l or "نسائ" in l:
+            return "female"
+        if "male" in l or "رجال" in l:
+            return "male"
+        return "all"
 
     @classmethod
     def get_gender_options(cls, lang_code: str = "ar") -> List[str]:
         lang = "en" if lang_code == "en" else "ar"
         mapping = cls.GENDER_LABELS_BY_LANG[lang]
-        return [mapping["male"], mapping["female"]]
+        return [mapping["all"], mapping["custom"], mapping["male"], mapping["female"]]
 
     @classmethod
     def resolve_gender_key(cls, gender_label: str) -> str:
-        if not gender_label:
-            return "male"
-        if gender_label in cls.GENDERS:
-            return cls.GENDERS[gender_label]
-        lower_val = gender_label.lower()
-        if "female" in lower_val or "النساء" in lower_val or "نسائية" in lower_val:
-            return "female"
-        return "male"
+        return cls.resolve_category_key(gender_label)
 
     @classmethod
     def get_gender_display_label(cls, gender_key: str, lang_code: str = "ar") -> str:
         lang = "en" if lang_code == "en" else "ar"
-        key = "female" if gender_key == "female" else "male"
-        return cls.GENDER_LABELS_BY_LANG[lang][key]
+        key = gender_key if gender_key in cls.CATEGORY_LABELS_BY_LANG[lang] else "all"
+        return cls.CATEGORY_LABELS_BY_LANG[lang][key]
 
     @classmethod
-    def get_speaker_options(cls, gender_key: str = "male", lang_code: str = "ar") -> List[str]:
+    def get_speaker_options(cls, category_key: str = "all", lang_code: str = "ar") -> List[str]:
+        cls.refresh_custom_speakers()
         lang = "en" if lang_code == "en" else "ar"
-        key = "female" if gender_key == "female" else "male"
-        return [item[lang] for item in cls.SPEAKER_CATALOG[key]]
+        cat = cls.resolve_category_key(category_key)
+        if cat == "all":
+            all_items = cls.SPEAKER_CATALOG["custom"] + cls.SPEAKER_CATALOG["male"] + cls.SPEAKER_CATALOG["female"]
+            return [item[lang] for item in all_items]
+        return [item[lang] for item in cls.SPEAKER_CATALOG.get(cat, [])]
+
+    @classmethod
+    def get_all_installed_voices(cls) -> List[Dict[str, Any]]:
+        cls.refresh_custom_speakers()
+        voices = []
+        for cat in ("custom", "male", "female"):
+            for item in cls.SPEAKER_CATALOG.get(cat, []):
+                voices.append({
+                    "id": item["id"],
+                    "name": item["raw"],
+                    "category": cat,
+                    "gender": item.get("gender", cat),
+                    "is_custom": item.get("is_custom", False),
+                    "display_ar": item["ar"],
+                    "display_en": item["en"],
+                    "wav_path": item.get("wav_path") or os.path.join(SPEAKERS_DIR, f"{item['id']}.wav"),
+                })
+        return voices
+
+    @classmethod
+    def delete_custom_voice(cls, voice_id: str) -> bool:
+        """Deletes custom voice audio and metadata."""
+        clean_id = cls.resolve_speaker_id(voice_id)
+        deleted = False
+        for p in (
+            os.path.join(CUSTOM_DIR, f"{clean_id}.wav"),
+            os.path.join(MALE_DIR, f"{clean_id}.wav"),
+            os.path.join(FEMALE_DIR, f"{clean_id}.wav"),
+            os.path.join(SPEAKERS_DIR, f"{clean_id}.wav"),
+            os.path.join(SAVED_PROMPTS_DIR, f"{clean_id}.pt"),
+        ):
+            if os.path.exists(p):
+                try:
+                    os.remove(p)
+                    deleted = True
+                except Exception:
+                    pass
+
+        meta_file = os.path.join(SPEAKERS_DIR, "voices_metadata.json")
+        if os.path.exists(meta_file):
+            import json
+            try:
+                with open(meta_file, "r", encoding="utf-8") as f:
+                    meta = json.load(f)
+                if clean_id in meta:
+                    del meta[clean_id]
+                    with open(meta_file, "w", encoding="utf-8") as f:
+                        json.dump(meta, f, ensure_ascii=False, indent=2)
+            except Exception:
+                pass
+
+        cls.refresh_custom_speakers()
+        return deleted
 
     @classmethod
     def _extract_raw_speaker_name(cls, speaker_display: str) -> str:
         if not speaker_display:
             return "Damien Black"
         text = speaker_display
+        if text.startswith("⭐"):
+            text = text[1:].strip()
         for sep in ("—", "(", "-"):
             if sep in text:
                 text = text.split(sep)[0]
@@ -392,6 +531,7 @@ class XTTSEngineManager:
     def resolve_speaker_id(cls, speaker_display: str) -> str:
         if not speaker_display:
             return "Damien_Black"
+        cls.refresh_custom_speakers()
         raw_name = cls._extract_raw_speaker_name(speaker_display)
         clean_name = raw_name.replace(" ", "_")
         for group in cls.SPEAKER_CATALOG.values():
@@ -402,6 +542,7 @@ class XTTSEngineManager:
 
     @classmethod
     def get_speaker_display_name(cls, speaker_identifier: str, lang_code: str = "ar") -> str:
+        cls.refresh_custom_speakers()
         lang = "en" if lang_code == "en" else "ar"
         speaker_id = cls.resolve_speaker_id(speaker_identifier)
         for group in cls.SPEAKER_CATALOG.values():
@@ -482,6 +623,8 @@ class XTTSEngineManager:
         clean_name = self.resolve_speaker_id(speaker)
 
         candidates = [
+            os.path.join(CUSTOM_DIR, f"{clean_name}.wav"),
+            os.path.join(CUSTOM_DIR, f"{raw_name}.wav"),
             os.path.join(MALE_DIR, f"{clean_name}.wav"),
             os.path.join(FEMALE_DIR, f"{clean_name}.wav"),
             os.path.join(SPEAKERS_DIR, f"{clean_name}.wav"),

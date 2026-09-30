@@ -62,6 +62,12 @@ class UnifiedTTSManager:
     def is_active_engine_ready(self) -> bool:
         return self.get_active_engine().is_ready
 
+    def get_all_installed_voices(self) -> List[Dict[str, Any]]:
+        return self.xtts_engine.get_all_installed_voices()
+
+    def delete_custom_voice(self, voice_id: str) -> bool:
+        return self.xtts_engine.delete_custom_voice(voice_id)
+
     def get_active_device_label(self) -> str:
         return self.get_active_engine().device_label
 
@@ -99,14 +105,38 @@ class UnifiedTTSManager:
         Unified dispatch: routes speech synthesis to active engine with broadcast DSP mastering.
         """
         if self.active_engine_name == "omnivoice":
+            # If a speaker voice is passed and no custom ref audio given, resolve speaker reference WAV and prompt
+            ref_audio = omnivoice_ref_audio
+            ref_prompt = omnivoice_prompt_path
+            mode = omnivoice_mode
+
+            if not ref_audio and not ref_prompt and speaker_or_instruct:
+                clean_id = self.xtts_engine.resolve_speaker_id(speaker_or_instruct)
+                candidates = [
+                    os.path.join(self.xtts_engine.temp_dir, "..", "speakers", "custom", f"{clean_id}.wav"),
+                    os.path.join(self.xtts_engine.temp_dir, "..", "speakers", "male", f"{clean_id}.wav"),
+                    os.path.join(self.xtts_engine.temp_dir, "..", "speakers", "female", f"{clean_id}.wav"),
+                    os.path.join(self.xtts_engine.temp_dir, "..", "speakers", f"{clean_id}.wav"),
+                ]
+                for cand in candidates:
+                    norm_cand = os.path.abspath(cand)
+                    if os.path.exists(norm_cand):
+                        ref_audio = norm_cand
+                        mode = "clone"
+                        break
+
+                cand_pt = os.path.abspath(os.path.join(self.xtts_engine.temp_dir, "..", "saved_prompts", f"{clean_id}.pt"))
+                if os.path.exists(cand_pt):
+                    ref_prompt = cand_pt
+
             result = self.omnivoice_engine.generate_speech(
                 text=text,
                 language=language,
-                mode=omnivoice_mode,
-                instruct=speaker_or_instruct if omnivoice_mode == "design" else None,
-                ref_audio=omnivoice_ref_audio,
+                mode=mode,
+                instruct=speaker_or_instruct if mode == "design" else None,
+                ref_audio=ref_audio,
                 ref_text=omnivoice_ref_text,
-                voice_prompt_path=omnivoice_prompt_path,
+                voice_prompt_path=ref_prompt,
                 speed=speed,
                 num_step=omnivoice_num_step,
                 progress_callback=progress_callback,

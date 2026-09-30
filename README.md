@@ -52,7 +52,15 @@ Built on `mcp.server.fastmcp`, Voice Studio exposes full speech synthesis capabi
 - `check_system_status`: Hardware acceleration and model readiness check.
 - Supports both standard I/O (`stdio`) and Server-Sent Events (`--sse --port 3900`).
 
-### 5. Asynchronous CustomTkinter Desktop GUI
+### 5. Unified Luxury Studio & Voice Recording Lab
+- **Single Unified Architecture**: Zero fragmentation — Speech Synthesis, Live Recording Lab, and Installed Voices Library operate inside one unified studio interface.
+- **Live Animated Soundwave Visualizer**: 48-bar neon gradient equalizer canvas animating at 35 FPS with real-time RMS, oscilloscope waveform line, and live dBFS peak meter.
+- **Multi-Stage Voice Readiness Diagnostic Suite**:
+  - `Stage 1`: Signal & Acoustic Quality Check (Duration, Peak dBFS, SNR noise floor, Clipping detection).
+  - `Stage 2`: Arabic Phonetic Articulation Test with inline preview audio.
+  - `Stage 3`: English & Bilingual Expression Test with inline preview audio.
+  - `Stage 4`: Universal Arbitrary Text Verification calculating a 0–100% Readiness Score.
+- **One-Click Voice Library Installation**: Installs verified voices permanently into the application catalog with instant availability across all speech synthesis workflows.
 - **Bidirectional UI Localization**: Instant runtime switching between **English (LTR)** and **Arabic (RTL)** across all menus, badges, dialogs, and controls.
 - **Hardware Acceleration Monitor**: Real-time badge tracking CUDA GPU acceleration vs multi-core CPU fallback.
 - **Embedded Audio Player Cards**: Interactive waveform playback, seek controls, and one-click WAV export.
@@ -208,7 +216,15 @@ This project is licensed under the **MIT License**. Third-party models and compo
 ### 4. خادم بروتوكول سياق النماذج للوكلاء الأذكياء (MCP Server)
 يتضمن المشروع خادماً معيارياً مدمجاً يتيح للمساعدين الأذكياء وأنظمة الأتمتة (مثل Claude Code و Cursor و Antigravity) الاتصال مباشرة بالمشروع وتوليد الأصوات برمجياً من خلال أدوات استدعاء معيارية عبر الطرفية أو بروتوكول تدفق الأحداث.
 
-### 5. واجهة مستخدم رسومية متطورة
+### 5. استوديو متكامل ومختبر تسجيل الأصوات المتقدم
+- **بنية موحدة شاملة**: إنهاء أي تجزئة في المشروع — دمج استوديو التوليد، مختبر التسجيل الحي، ومكتبة الأصوات المثبتة في واجهة موحدة واحدة.
+- **أنيميشن الموجات الصوتية الحية**: كانفاس تفاعلي بـ 48 عموداً نيونياً متدرجاً ينبض بالوقت الفعلي (35 إطار/ث) مع خط الأوسيلوسكوب ومقياس الذروة الرقمي (dBFS).
+- **منظومة اختبارات جاهزية الصوت المتعددة (4 مراحل فحص دقيقة)**:
+  - `المرحلة 1`: فحص نقاء وجودة الإشارة الصوتية (المدة، ذروة الصوت، نسبة الإشارة للضوضاء SNR، والتشبع).
+  - `المرحلة 2`: اختبار نطق النص العربي الفصيح مع زر استماع فوري.
+  - `المرحلة 3`: اختبار نطق النص الإنجليزي والتناغم النبري مع زر استماع فوري.
+  - `المرحلة 4`: فحص الجاهزية الشاملة لنطق أي نص مع حساب مؤشر الجاهزية (0 إلى 100%) وشارة الاعتماد.
+- **تثبيت الأصوات المعتمدة بنقرة واحدة**: حفظ الأصوات المسجلة تلقائياً في مكتبة البرنامج وإتاحتها فوراً لكافة أنماط التوليد الصوتي.
 - **تعريب فوري شامل (عربي ⇄ إنجليزي)**: تبديل لغة الواجهة والقوائم ومحاذاة النصوص بنقرة زر واحدة دون الحاجة لإعادة تشغيل البرنامج.
 - **كاشف العتاد والتسريع الآلي**: رصد بطاقة الرسوميات (NVIDIA CUDA) والتبديل التلقائي إلى المعالج المركزي في حال عدم توفر كرت شاشة مخصص.
 - **بطاقات استماع وتصدير**: مشغل صوتي تفاعلي لكل رد صوتي مع إمكانية التقديم والتأخير وحفظ الملف بصيغة WAV في أي مسار يختاره المستخدم.
